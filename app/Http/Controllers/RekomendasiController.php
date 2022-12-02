@@ -39,15 +39,15 @@ class RekomendasiController extends Controller
     public function store(Request $request)
     {
         //MENGANALISA KELUHAN
+        $tahunLahir = $request->tahunlahir;
         $keluhan = $request->keluhan;
-        $lahir = $request->lahir;
-        $ambil = new masukan($keluhan, $lahir);
+        $ambil = new penggunaan($tahunLahir, $keluhan);
         $data = [
-            'nama_jamu' => $ambil->namaJamu(),
+            'namajamu' => $ambil->namajamu(),
             'khasiat' => $keluhan,
             'keluhan' => $keluhan,
-            'umur' => $ambil->hitungUmur(), 
-            'saranPenggunaan' => $ambil->penggunaan() . $ambil->saran()
+            'umur' => $ambil->hitungUmur(),
+            'saran' => $ambil->cara() . $ambil->saran(),
         ];
         return view('rekomendasi',compact('data'));
     }
@@ -98,47 +98,47 @@ class RekomendasiController extends Controller
     }
 }
 
-class jamu {
-    public function __construct($keluhan, $lahir) {
-        $this->keluhan = $keluhan;
-        $this->lahir = $lahir;
-    }
-    public function namaJamu()
+class Jamu {
+    public function __construct($tahunLahir, $keluhan)
     {
-        if ($this->keluhan == 'keseleo' && 'kurang nafsu makan') {
+        $this->tahun = $tahunLahir;
+        $this->keluhan = $keluhan;
+    }
+    public function namajamu()
+    {
+        if ($this->keluhan == 'keseleo' || $this->keluhan == 'kurang nafsu makan') {
             return 'Beras Kencur';
-        } else if ($this->keluhan == 'pegal-pegal') {
+        } else if ($this->keluhan == 'pegal-pegal'){
             return 'Kunyit Asam';
-        } else if ($this->keluhan == 'darah tinggi' && 'gula darah') {
+        } else if ($this->keluhan == 'darah tinggi' || $this->keluhan == 'gula darah'){
             return 'Brotowali';
-        } else if ($this->keluhan == 'kram perut' && 'masuk angin') {
-            return 'Temulawak Pait';
+        } else if ($this->keluhan == 'kram perut' || $this->keluhan == 'masuk angin'){
+            return 'Temulawak';
         } else {
-            return 'Jamu Belum Tersedia';
+            return 'Jamu Belum Ditemukan';
         }
         
     }
     public function hitungUmur()
     {
-        return date('Y') - $this->lahir;
+        return date('Y') - $this->tahun;
     }
 }
-class masukan extends jamu {
+class penggunaan extends Jamu{
     public function saran()
     {
         if ($this->hitungUmur() <= 10) {
             return ' 1x';
         } else {
-            return ' 2x';
+            return '2x';
         }
-        
     }
-    public function penggunaan()
+    public function cara()
     {
-        if ($this->namaJamu() == 'Beras Kencur') {
+        if ($this->namajamu() == 'Beras Kencur' && $this->keluhan = 'keseleo') {
             return 'Dioleskan';
         } else {
-            return 'Dikonsumsi';
+            return 'Diminum';
         }
         
     }
